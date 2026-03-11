@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const API_BASE = "https://maadala.onrender.com/api/liabilities";
+const API_BASE = "https://personal-finance-tracker-y5n7.onrender.com/api/liabilities";
 
 const formatCurrency = (val) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val || 0);

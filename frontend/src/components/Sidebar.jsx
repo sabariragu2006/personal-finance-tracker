@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-const ASSETS_API      = "https://maadala.onrender.com/api/assets";
-const LIABILITIES_API = "https://maadala.onrender.com/api/liabilities";
-const TRANSACTIONS_API = "https://maadala.onrender.com/api/transactions";
+const ASSETS_API      = "https://personal-finance-tracker-y5n7.onrender.com/api/assets";
+const LIABILITIES_API = "https://personal-finance-tracker-y5n7.onrender.com/api/liabilities";
+const TRANSACTIONS_API = "https://personal-finance-tracker-y5n7.onrender.com/api/transactions";
 
 const NAV_ITEMS = [
   {

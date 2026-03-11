@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API_BASE = "https://maadala.onrender.com/api";
+const API_BASE = "https://personal-finance-tracker-y5n7.onrender.com/api";
 
 // ─── Decorative left-panel stats ──────────────────────────────────────────────
 const PANEL_STATS = [

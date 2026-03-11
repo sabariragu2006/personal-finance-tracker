@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API = "https://maadala.onrender.com/api/auth";
+const API = "https://personal-finance-tracker-y5n7.onrender.com/api/auth";
 
 function getToken() {
   return localStorage.getItem("vaultfolio_token") || "";

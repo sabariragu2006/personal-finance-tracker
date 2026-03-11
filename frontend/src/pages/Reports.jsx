@@ -3,9 +3,9 @@ import {
   PieChart, Pie, Cell, Tooltip, Sector,
 } from "recharts";
 
-const ASSETS_API      = "https://maadala.onrender.com/api/assets";
-const LIABILITIES_API = "https://maadala.onrender.com/api/liabilities";
-const TRANSACTIONS_API = "https://maadala.onrender.com/api/transactions/summary";
+const ASSETS_API      = "https://personal-finance-tracker-y5n7.onrender.com/api/assets";
+const LIABILITIES_API = "https://personal-finance-tracker-y5n7.onrender.com/api/liabilities";
+const TRANSACTIONS_API = "https://personal-finance-tracker-y5n7.onrender.com/api/transactions/summary";
 
 // ─── Palette — 12 distinct slices, rich but not garish ───────────────────────
 const PALETTE = [

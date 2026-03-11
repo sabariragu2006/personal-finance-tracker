@@ -136,7 +136,7 @@ function Navbar({ onLogin, onRegister }) {
         <span style={{
           fontFamily: "'DM Serif Display', serif",
           fontSize: 18, color: "#f0f4ff", letterSpacing: "-0.3px",
-        }}>Vaultfolio</span>
+        }}>Maadala</span>
       </div>
 
       {/* Links */}
@@ -560,10 +560,10 @@ function Footer({ onLogin, onRegister }) {
             <span style={{
               fontFamily: "'DM Serif Display', serif",
               fontSize: 15, color: "#dce8f4",
-            }}>Vaultfolio</span>
+            }}>Maadala</span>
           </div>
           <p style={{ fontSize: 10, color: "#1a2535", fontFamily: "'DM Mono', monospace", letterSpacing: "0.06em" }}>
-            © 2025 · Personal Finance Tracker
+            © 2025 · Sabari Raghu Personal Finance Tracker
           </p>
         </div>
 

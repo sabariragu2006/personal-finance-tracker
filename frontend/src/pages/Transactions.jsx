@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API_BASE = "https://maadala.onrender.com/api/transactions";
+const API_BASE = "https://personal-finance-tracker-y5n7.onrender.com/api/transactions";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 

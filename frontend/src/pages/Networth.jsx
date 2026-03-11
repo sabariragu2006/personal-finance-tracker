@@ -11,8 +11,8 @@ import {
   Legend,
 } from "recharts";
 
-const ASSETS_API      = "https://maadala.onrender.com/api/assets";
-const LIABILITIES_API = "https://maadala.onrender.com/api/liabilities";
+const ASSETS_API      = "https://personal-finance-tracker-y5n7.onrender.com/api/assets";
+const LIABILITIES_API = "https://personal-finance-tracker-y5n7.onrender.com/api/liabilities";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
