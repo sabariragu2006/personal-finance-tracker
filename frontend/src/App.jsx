@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar      from "./components/Sidebar";
+import Dashboard    from "./pages/Dashboard";
 import AssetManager from "./pages/AssetManager";
 import Liabilities  from "./pages/LiabilityManager";
 import NetWorth     from "./pages/Networth";
@@ -13,32 +14,41 @@ const BASE = import.meta.env.VITE_API_URL;
 
 function App() {
   const [view,   setView]   = useState("home");
-  const [active, setActive] = useState("assets");
+  const [active, setActive] = useState("dashboard");
   const [user,   setUser]   = useState(null);
   const [token,  setToken]  = useState(() => localStorage.getItem("vaultfolio_token") || "");
 
-  // Re-hydrate user from stored token on page load
   useEffect(() => {
-    if (!token) return;
+    const storedToken = localStorage.getItem("vaultfolio_token");
+    if (!storedToken) return;
+
     fetch(`${BASE}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${storedToken}` },
     })
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data?.user) {
           setUser(data.user);
+          setToken(storedToken);
           setView("app");
+        } else {
+          localStorage.removeItem("vaultfolio_token");
+          setToken("");
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        localStorage.removeItem("vaultfolio_token");
+        setToken("");
+      });
   }, []);
 
   const handleAuthSuccess = (data) => {
+    if (!data?.token) return;
     localStorage.setItem("vaultfolio_token", data.token);
     setToken(data.token);
-    setUser(data.user);
+    setUser(data.user ?? null);
     setView("app");
-    setActive("assets");
+    setActive("dashboard");
   };
 
   const handleLogout = () => {
@@ -55,8 +65,8 @@ function App() {
   if (view === "home") {
     return (
       <HomePage
-        onLogin={()    => setView("login")}
-        onRegister={()  => setView("register")}
+        onLogin={()   => setView("login")}
+        onRegister={() => setView("register")}
       />
     );
   }
@@ -88,8 +98,9 @@ function App() {
         minWidth: 0,
         height: "100%",
         minHeight: "100vh",
-        overflowY: "auto"
+        overflowY: "auto",
       }}>
+        {active === "dashboard"    && <Dashboard    token={token} />}
         {active === "assets"       && <AssetManager token={token} />}
         {active === "liabilities"  && <Liabilities  token={token} />}
         {active === "networth"     && <NetWorth      token={token} />}

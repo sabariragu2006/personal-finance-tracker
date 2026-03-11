@@ -295,14 +295,19 @@ const txStyles = {
 
 // ─── Delete Confirm Modal ─────────────────────────────────────────────────────
 
-function DeleteModal({ tx, onClose, onDeleted }) {
+function DeleteModal({ tx, token, onClose, onDeleted }) {
   const [loading, setLoading] = useState(false);
   const meta = TYPE_META[tx.type] || {};
 
   const handleDelete = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/${tx._id}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE}/${tx._id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error();
       onDeleted(tx._id);
       onClose();
@@ -491,9 +496,11 @@ export default function Transactions({ token }) {
       params.set("page",  filters.page);
       params.set("limit", 20);
 
+      const headers = { Authorization: `Bearer ${token}` };
+
       const [txRes, sumRes] = await Promise.all([
-        fetch(`${API_BASE}?${params}`),
-        fetch(`${API_BASE}/summary`),
+        fetch(`${API_BASE}?${params}`, { headers }),
+        fetch(`${API_BASE}/summary`,   { headers }),
       ]);
 
       if (!txRes.ok) throw new Error("Could not load transactions.");
@@ -508,7 +515,7 @@ export default function Transactions({ token }) {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, token]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -609,6 +616,7 @@ export default function Transactions({ token }) {
       {deleteTx && (
         <DeleteModal
           tx={deleteTx}
+          token={token}
           onClose={() => setDeleteTx(null)}
           onDeleted={handleDeleted}
         />

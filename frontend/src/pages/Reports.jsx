@@ -367,10 +367,12 @@ export default function Reports({ token }) {
   useEffect(() => {
     (async () => {
       try {
+        const headers = { Authorization: `Bearer ${token}` };
+
         const [aRes, lRes, tRes] = await Promise.all([
-          fetch(ASSETS_API),
-          fetch(LIABILITIES_API),
-          fetch(TRANSACTIONS_API),
+          fetch(ASSETS_API,       { headers }),
+          fetch(LIABILITIES_API,  { headers }),
+          fetch(TRANSACTIONS_API, { headers }),
         ]);
         if (!aRes.ok) throw new Error("Failed to load assets.");
         const [aData, lData, tData] = await Promise.all([
@@ -387,7 +389,7 @@ export default function Reports({ token }) {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [token]);
 
   const handleSort = useCallback((col) => {
     setSortDir((d) => (sortKey === col ? (d === "desc" ? "asc" : "desc") : "desc"));
