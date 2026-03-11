@@ -9,11 +9,11 @@ const JWT_SECRET  = process.env.JWT_SECRET  || "vaultfolio_secret_change_in_prod
 const JWT_EXPIRES = process.env.JWT_EXPIRES || "7d";
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  INTERNAL HELPER — log a transaction record
-//  Never throws — a logging failure must never crash the parent operation.
+//  INTERNAL HELPER — log a transaction record (now scoped to user)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const _log = async ({
+  user_id,
   type,
   entity_type,
   entity_id,
@@ -28,6 +28,7 @@ const _log = async ({
 }) => {
   try {
     await new Transaction({
+      user_id,
       type,
       entity_type,
       entity_id,
@@ -51,7 +52,7 @@ const _log = async ({
 
 const getAllAssets = async (req, res) => {
   try {
-    const assets = await Asset.find().sort({ createdAt: -1 });
+    const assets = await Asset.find({ user_id: req.userId }).sort({ createdAt: -1 });
     res.status(200).json(assets);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch assets", error: error.message });
@@ -60,7 +61,7 @@ const getAllAssets = async (req, res) => {
 
 const getAssetById = async (req, res) => {
   try {
-    const asset = await Asset.findById(req.params.id);
+    const asset = await Asset.findOne({ _id: req.params.id, user_id: req.userId });
     if (!asset) return res.status(404).json({ message: "Asset not found" });
     res.status(200).json(asset);
   } catch (error) {
@@ -73,6 +74,7 @@ const createAsset = async (req, res) => {
     const { asset_name, institution, invested_value, invested_date, notes } = req.body;
 
     const asset = new Asset({
+      user_id: req.userId,
       asset_name,
       institution,
       invested_value,
@@ -87,6 +89,7 @@ const createAsset = async (req, res) => {
     const saved = await asset.save();
 
     await _log({
+      user_id:          req.userId,
       type:             "asset_create",
       entity_type:      "asset",
       entity_id:        saved._id,
@@ -112,7 +115,7 @@ const updateAsset = async (req, res) => {
   try {
     const { asset_name, institution, invested_value, current_value, invested_date, notes } = req.body;
 
-    const existing = await Asset.findById(req.params.id);
+    const existing = await Asset.findOne({ _id: req.params.id, user_id: req.userId });
     if (!existing) return res.status(404).json({ message: "Asset not found" });
 
     const previousValue     = existing.current_value;
@@ -127,6 +130,7 @@ const updateAsset = async (req, res) => {
       existing.value_history.push({ value: current_value, recorded_at: new Date() });
 
       await _log({
+        user_id:      req.userId,
         type:         "asset_value_update",
         entity_type:  "asset",
         entity_id:    existing._id,
@@ -156,7 +160,7 @@ const updateCurrentValue = async (req, res) => {
     if (current_value === undefined || current_value < 0)
       return res.status(400).json({ message: "A valid current_value is required." });
 
-    const asset = await Asset.findById(req.params.id);
+    const asset = await Asset.findOne({ _id: req.params.id, user_id: req.userId });
     if (!asset) return res.status(404).json({ message: "Asset not found" });
 
     const previousValue  = asset.current_value;
@@ -166,6 +170,7 @@ const updateCurrentValue = async (req, res) => {
     const saved = await asset.save();
 
     await _log({
+      user_id:      req.userId,
       type:         "asset_value_update",
       entity_type:  "asset",
       entity_id:    saved._id,
@@ -190,7 +195,7 @@ const buyAsset = async (req, res) => {
     if (!parsedAmount || parsedAmount <= 0)
       return res.status(400).json({ message: "A positive buy amount is required." });
 
-    const asset = await Asset.findById(req.params.id);
+    const asset = await Asset.findOne({ _id: req.params.id, user_id: req.userId });
     if (!asset) return res.status(404).json({ message: "Asset not found" });
 
     if (asset.current_value == null) asset.current_value = asset.invested_value;
@@ -205,6 +210,7 @@ const buyAsset = async (req, res) => {
     const saved = await asset.save();
 
     await _log({
+      user_id:          req.userId,
       type:             "asset_buy",
       entity_type:      "asset",
       entity_id:        saved._id,
@@ -218,7 +224,6 @@ const buyAsset = async (req, res) => {
 
     res.status(200).json(saved);
   } catch (error) {
-    console.error("BUY ERROR:", error);
     res.status(500).json({ message: "Failed to process buy", error: error.message });
   }
 };
@@ -230,7 +235,7 @@ const sellAsset = async (req, res) => {
     if (!proceeds || proceeds <= 0)
       return res.status(400).json({ message: "A positive sell proceeds amount is required." });
 
-    const asset = await Asset.findById(req.params.id);
+    const asset = await Asset.findOne({ _id: req.params.id, user_id: req.userId });
     if (!asset) return res.status(404).json({ message: "Asset not found" });
 
     if (proceeds > asset.current_value)
@@ -252,6 +257,7 @@ const sellAsset = async (req, res) => {
     const saved = await asset.save();
 
     await _log({
+      user_id:          req.userId,
       type:             "asset_sell",
       entity_type:      "asset",
       entity_id:        saved._id,
@@ -272,7 +278,7 @@ const sellAsset = async (req, res) => {
 
 const deleteAsset = async (req, res) => {
   try {
-    const asset = await Asset.findByIdAndDelete(req.params.id);
+    const asset = await Asset.findOneAndDelete({ _id: req.params.id, user_id: req.userId });
     if (!asset) return res.status(404).json({ message: "Asset not found" });
     res.status(200).json({ message: "Asset deleted successfully", id: req.params.id });
   } catch (error) {
@@ -286,7 +292,7 @@ const deleteAsset = async (req, res) => {
 
 const getAllLiabilities = async (req, res) => {
   try {
-    const liabilities = await Liability.find().sort({ createdAt: -1 });
+    const liabilities = await Liability.find({ user_id: req.userId }).sort({ createdAt: -1 });
     res.status(200).json(liabilities);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch liabilities", error: error.message });
@@ -295,7 +301,7 @@ const getAllLiabilities = async (req, res) => {
 
 const getLiabilityById = async (req, res) => {
   try {
-    const liability = await Liability.findById(req.params.id);
+    const liability = await Liability.findOne({ _id: req.params.id, user_id: req.userId });
     if (!liability) return res.status(404).json({ message: "Liability not found" });
     res.status(200).json(liability);
   } catch (error) {
@@ -314,6 +320,7 @@ const createLiability = async (req, res) => {
     const initialBalance = current_balance ?? original_amount;
 
     const liability = new Liability({
+      user_id: req.userId,
       liability_name,
       lender,
       liability_type:  liability_type  || "loan",
@@ -335,6 +342,7 @@ const createLiability = async (req, res) => {
     const saved = await liability.save();
 
     await _log({
+      user_id:          req.userId,
       type:             "liability_create",
       entity_type:      "liability",
       entity_id:        saved._id,
@@ -363,7 +371,7 @@ const updateLiability = async (req, res) => {
       interest_rate, monthly_payment, due_date, start_date, notes,
     } = req.body;
 
-    const existing = await Liability.findById(req.params.id);
+    const existing = await Liability.findOne({ _id: req.params.id, user_id: req.userId });
     if (!existing) return res.status(404).json({ message: "Liability not found" });
 
     existing.liability_name  = liability_name;
@@ -394,7 +402,7 @@ const updateCurrentBalance = async (req, res) => {
     if (current_balance === undefined || current_balance < 0)
       return res.status(400).json({ message: "A valid current_balance is required." });
 
-    const liability = await Liability.findById(req.params.id);
+    const liability = await Liability.findOne({ _id: req.params.id, user_id: req.userId });
     if (!liability) return res.status(404).json({ message: "Liability not found" });
 
     const previousBalance     = liability.current_balance;
@@ -409,6 +417,7 @@ const updateCurrentBalance = async (req, res) => {
     const saved = await liability.save();
 
     await _log({
+      user_id:      req.userId,
       type:         "liability_balance_update",
       entity_type:  "liability",
       entity_id:    saved._id,
@@ -432,7 +441,7 @@ const makePayment = async (req, res) => {
     if (!amount || amount <= 0)
       return res.status(400).json({ message: "A positive payment amount is required." });
 
-    const liability = await Liability.findById(req.params.id);
+    const liability = await Liability.findOne({ _id: req.params.id, user_id: req.userId });
     if (!liability) return res.status(404).json({ message: "Liability not found" });
 
     if (amount > liability.current_balance)
@@ -451,6 +460,7 @@ const makePayment = async (req, res) => {
     const saved = await liability.save();
 
     await _log({
+      user_id:          req.userId,
       type:             "liability_payment",
       entity_type:      "liability",
       entity_id:        saved._id,
@@ -470,7 +480,7 @@ const makePayment = async (req, res) => {
 
 const deleteLiability = async (req, res) => {
   try {
-    const liability = await Liability.findByIdAndDelete(req.params.id);
+    const liability = await Liability.findOneAndDelete({ _id: req.params.id, user_id: req.userId });
     if (!liability) return res.status(404).json({ message: "Liability not found" });
     res.status(200).json({ message: "Liability deleted successfully", id: req.params.id });
   } catch (error) {
@@ -486,6 +496,7 @@ const getTransactionSummary = async (req, res) => {
   try {
     const [typeBreakdown, recentActivity, totalCount] = await Promise.all([
       Transaction.aggregate([
+        { $match: { user_id: req.userId } },
         {
           $group: {
             _id:          "$type",
@@ -495,8 +506,8 @@ const getTransactionSummary = async (req, res) => {
         },
         { $sort: { count: -1 } },
       ]),
-      Transaction.find().sort({ transaction_date: -1 }).limit(5),
-      Transaction.countDocuments(),
+      Transaction.find({ user_id: req.userId }).sort({ transaction_date: -1 }).limit(5),
+      Transaction.countDocuments({ user_id: req.userId }),
     ]);
 
     res.status(200).json({ typeBreakdown, recentActivity, totalCount });
@@ -512,7 +523,7 @@ const getAllTransactions = async (req, res) => {
       limit = 20, page = 1,
     } = req.query;
 
-    const filter = {};
+    const filter = { user_id: req.userId };
     if (entity_type) filter.entity_type = entity_type;
     if (entity_id)   filter.entity_id   = entity_id;
     if (type)        filter.type        = { $in: type.split(",") };
@@ -547,7 +558,7 @@ const getAllTransactions = async (req, res) => {
 
 const getTransactionById = async (req, res) => {
   try {
-    const tx = await Transaction.findById(req.params.id);
+    const tx = await Transaction.findOne({ _id: req.params.id, user_id: req.userId });
     if (!tx) return res.status(404).json({ message: "Transaction not found" });
     res.status(200).json(tx);
   } catch (error) {
@@ -557,7 +568,7 @@ const getTransactionById = async (req, res) => {
 
 const deleteTransaction = async (req, res) => {
   try {
-    const tx = await Transaction.findByIdAndDelete(req.params.id);
+    const tx = await Transaction.findOneAndDelete({ _id: req.params.id, user_id: req.userId });
     if (!tx) return res.status(404).json({ message: "Transaction not found" });
     res.status(200).json({ message: "Transaction deleted", id: req.params.id });
   } catch (error) {
@@ -572,17 +583,14 @@ const deleteTransaction = async (req, res) => {
 const signToken = (userId) =>
   jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
 
-// POST /api/auth/register
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password)
       return res.status(400).json({ message: "Name, email, and password are required." });
-
     if (!/\S+@\S+\.\S+/.test(email))
       return res.status(400).json({ message: "Please provide a valid email address." });
-
     if (password.length < 8)
       return res.status(400).json({ message: "Password must be at least 8 characters." });
 
@@ -598,7 +606,6 @@ const register = async (req, res) => {
     }).save();
 
     const token = signToken(user._id);
-
     res.status(201).json({
       message: "Account created successfully.",
       token,
@@ -611,7 +618,6 @@ const register = async (req, res) => {
   }
 };
 
-// POST /api/auth/login
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -628,7 +634,6 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password." });
 
     const token = signToken(user._id);
-
     res.status(200).json({
       message: "Logged in successfully.",
       token,
@@ -639,7 +644,6 @@ const login = async (req, res) => {
   }
 };
 
-// GET /api/auth/me — reads token directly from Authorization header (no middleware needed)
 const getMe = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -647,10 +651,9 @@ const getMe = async (req, res) => {
       return res.status(401).json({ message: "Not authorised. No token provided." });
 
     const token   = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET);  // throws if invalid or expired
+    const decoded = jwt.verify(token, JWT_SECRET);
     const user    = await User.findById(decoded.id);
-    if (!user)
-      return res.status(404).json({ message: "User not found." });
+    if (!user) return res.status(404).json({ message: "User not found." });
 
     res.status(200).json({ user: { id: user._id, name: user.name, email: user.email } });
   } catch {
@@ -658,16 +661,8 @@ const getMe = async (req, res) => {
   }
 };
 
-
-
-// PUT /api/auth/profile
 const updateProfile = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer "))
-      return res.status(401).json({ message: "Not authorised." });
-
-    const decoded = jwt.verify(authHeader.split(" ")[1], JWT_SECRET);
     const { name, email } = req.body;
 
     if (!name || !email)
@@ -675,12 +670,12 @@ const updateProfile = async (req, res) => {
     if (!/\S+@\S+\.\S+/.test(email))
       return res.status(400).json({ message: "Please provide a valid email address." });
 
-    const conflict = await User.findOne({ email: email.toLowerCase(), _id: { $ne: decoded.id } });
+    const conflict = await User.findOne({ email: email.toLowerCase(), _id: { $ne: req.userId } });
     if (conflict)
       return res.status(409).json({ message: "That email is already in use." });
 
     const user = await User.findByIdAndUpdate(
-      decoded.id,
+      req.userId,
       { name: name.trim(), email: email.toLowerCase().trim() },
       { new: true, runValidators: true }
     );
@@ -688,20 +683,12 @@ const updateProfile = async (req, res) => {
 
     res.status(200).json({ message: "Profile updated.", user: { id: user._id, name: user.name, email: user.email } });
   } catch (err) {
-    if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError")
-      return res.status(401).json({ message: "Token invalid or expired." });
     res.status(500).json({ message: "Failed to update profile.", error: err.message });
   }
 };
 
-// PUT /api/auth/change-password
 const changePassword = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer "))
-      return res.status(401).json({ message: "Not authorised." });
-
-    const decoded = jwt.verify(authHeader.split(" ")[1], JWT_SECRET);
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword)
@@ -709,7 +696,7 @@ const changePassword = async (req, res) => {
     if (newPassword.length < 8)
       return res.status(400).json({ message: "New password must be at least 8 characters." });
 
-    const user = await User.findById(decoded.id).select("+password");
+    const user = await User.findById(req.userId).select("+password");
     if (!user) return res.status(404).json({ message: "User not found." });
 
     const valid = await bcrypt.compare(currentPassword, user.password);
@@ -721,47 +708,29 @@ const changePassword = async (req, res) => {
 
     res.status(200).json({ message: "Password updated successfully." });
   } catch (err) {
-    if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError")
-      return res.status(401).json({ message: "Token invalid or expired." });
     res.status(500).json({ message: "Failed to change password.", error: err.message });
   }
 };
 
-// DELETE /api/auth/account
 const deleteAccount = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer "))
-      return res.status(401).json({ message: "Not authorised." });
-
-    const decoded = jwt.verify(authHeader.split(" ")[1], JWT_SECRET);
-    const user    = await User.findByIdAndDelete(decoded.id);
+    const user = await User.findByIdAndDelete(req.userId);
     if (!user) return res.status(404).json({ message: "User not found." });
-
     res.status(200).json({ message: "Account deleted successfully." });
   } catch (err) {
-    if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError")
-      return res.status(401).json({ message: "Token invalid or expired." });
     res.status(500).json({ message: "Failed to delete account.", error: err.message });
   }
 };
 
 // ═════════════════════════════════════════════════════════════════════════════
-//  EXPORTS — single consolidated block
+//  EXPORTS
 // ═════════════════════════════════════════════════════════════════════════════
 module.exports = {
-  // Assets
   getAllAssets, getAssetById, createAsset, updateAsset,
   updateCurrentValue, buyAsset, sellAsset, deleteAsset,
-
-  // Liabilities
   getAllLiabilities, getLiabilityById, createLiability, updateLiability,
   updateCurrentBalance, makePayment, deleteLiability,
-
-  // Transactions
   getAllTransactions, getTransactionById, getTransactionSummary, deleteTransaction,
-
-  // Auth
   register, login, getMe,
   updateProfile, changePassword, deleteAccount,
 };

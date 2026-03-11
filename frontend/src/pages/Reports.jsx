@@ -3,9 +3,10 @@ import {
   PieChart, Pie, Cell, Tooltip, Sector,
 } from "recharts";
 
-const ASSETS_API      = "https://personal-finance-tracker-y5n7.onrender.com/api/assets";
-const LIABILITIES_API = "https://personal-finance-tracker-y5n7.onrender.com/api/liabilities";
-const TRANSACTIONS_API = "https://personal-finance-tracker-y5n7.onrender.com/api/transactions/summary";
+const BASE = import.meta.env.VITE_API_URL;
+const ASSETS_API       = `${BASE}/api/assets`;
+const LIABILITIES_API  = `${BASE}/api/liabilities`;
+const TRANSACTIONS_API = `${BASE}/api/transactions/summary`;
 
 // ─── Palette — 12 distinct slices, rich but not garish ───────────────────────
 const PALETTE = [
@@ -354,7 +355,7 @@ function SectionHeader({ eyebrow, title }) {
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-export default function Reports() {
+export default function Reports({ token }) {
   const [assets,      setAssets]      = useState([]);
   const [liabilities, setLiabilities] = useState([]);
   const [txSummary,   setTxSummary]   = useState(null);

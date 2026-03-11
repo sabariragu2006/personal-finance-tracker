@@ -1,5 +1,6 @@
-const express = require("express");
-const router  = express.Router();
+const express  = require("express");
+const router   = express.Router();
+const protect  = require("../Middleware/Autmiddleware");
 
 const {
   getAllAssets, getAssetById, createAsset, updateAsset,
@@ -10,37 +11,37 @@ const {
   register, login, getMe, updateProfile, changePassword, deleteAccount,
 } = require("../Controllers/Controllers");
 
-// ─── Auth ─────────────────────────────────────────────────────────────────────
+// ─── Auth (public) ────────────────────────────────────────────────────────────
 router.post  ("/auth/register",        register);
 router.post  ("/auth/login",           login);
 router.get   ("/auth/me",              getMe);
-router.put   ("/auth/profile",         updateProfile);
-router.put   ("/auth/change-password", changePassword);
-router.delete("/auth/account",         deleteAccount);
+router.put   ("/auth/profile",         protect, updateProfile);
+router.put   ("/auth/change-password", protect, changePassword);
+router.delete("/auth/account",         protect, deleteAccount);
 
-// ─── Assets ───────────────────────────────────────────────────────────────────
-router.get   ("/assets",                   getAllAssets);
-router.post  ("/assets",                   createAsset);
-router.get   ("/assets/:id",               getAssetById);
-router.put   ("/assets/:id",               updateAsset);
-router.delete("/assets/:id",               deleteAsset);
-router.patch ("/assets/:id/current-value", updateCurrentValue);
-router.post  ("/assets/:id/buy",           buyAsset);
-router.post  ("/assets/:id/sell",          sellAsset);
+// ─── Assets (protected) ───────────────────────────────────────────────────────
+router.get   ("/assets",                   protect, getAllAssets);
+router.post  ("/assets",                   protect, createAsset);
+router.get   ("/assets/:id",               protect, getAssetById);
+router.put   ("/assets/:id",               protect, updateAsset);
+router.delete("/assets/:id",               protect, deleteAsset);
+router.patch ("/assets/:id/current-value", protect, updateCurrentValue);
+router.post  ("/assets/:id/buy",           protect, buyAsset);
+router.post  ("/assets/:id/sell",          protect, sellAsset);
 
-// ─── Liabilities ──────────────────────────────────────────────────────────────
-router.get   ("/liabilities",                     getAllLiabilities);
-router.post  ("/liabilities",                     createLiability);
-router.get   ("/liabilities/:id",                 getLiabilityById);
-router.put   ("/liabilities/:id",                 updateLiability);
-router.delete("/liabilities/:id",                 deleteLiability);
-router.patch ("/liabilities/:id/current-balance", updateCurrentBalance);
-router.post  ("/liabilities/:id/pay",             makePayment);
+// ─── Liabilities (protected) ──────────────────────────────────────────────────
+router.get   ("/liabilities",                     protect, getAllLiabilities);
+router.post  ("/liabilities",                     protect, createLiability);
+router.get   ("/liabilities/:id",                 protect, getLiabilityById);
+router.put   ("/liabilities/:id",                 protect, updateLiability);
+router.delete("/liabilities/:id",                 protect, deleteLiability);
+router.patch ("/liabilities/:id/current-balance", protect, updateCurrentBalance);
+router.post  ("/liabilities/:id/pay",             protect, makePayment);
 
-// ─── Transactions ─────────────────────────────────────────────────────────────
-router.get   ("/transactions/summary", getTransactionSummary);
-router.get   ("/transactions",         getAllTransactions);
-router.get   ("/transactions/:id",     getTransactionById);
-router.delete("/transactions/:id",     deleteTransaction);
+// ─── Transactions (protected) ─────────────────────────────────────────────────
+router.get   ("/transactions/summary", protect, getTransactionSummary);
+router.get   ("/transactions",         protect, getAllTransactions);
+router.get   ("/transactions/:id",     protect, getTransactionById);
+router.delete("/transactions/:id",     protect, deleteTransaction);
 
 module.exports = router;

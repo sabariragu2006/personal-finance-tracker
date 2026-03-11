@@ -1,6 +1,6 @@
 import { useState } from "react";
-
-const API = "https://personal-finance-tracker-y5n7.onrender.com/api/auth";
+const BASE = import.meta.env.VITE_API_URL;
+const API = `${BASE}/api/auth`;
 
 function getToken() {
   return localStorage.getItem("vaultfolio_token") || "";
@@ -487,7 +487,7 @@ function Btn({ onClick, disabled, loading, color, label }) {
 }
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
-export default function Profile({ user, onUserUpdate, onLogout }) {
+export default function Profile({ user, onUserUpdate, onLogout,token  }) {
   const [toastMsg,  setToastMsg]  = useState("");
   const [toastType, setToastType] = useState("success");
 

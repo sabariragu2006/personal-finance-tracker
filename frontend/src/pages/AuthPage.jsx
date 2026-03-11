@@ -1,6 +1,6 @@
 import { useState } from "react";
-
-const API_BASE = "https://personal-finance-tracker-y5n7.onrender.com/api";
+const BASE = import.meta.env.VITE_API_URL;
+const API_BASE = `${BASE}/api`;
 
 // ─── Decorative left-panel stats ──────────────────────────────────────────────
 const PANEL_STATS = [

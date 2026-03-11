@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 
-const API_BASE = "https://personal-finance-tracker-y5n7.onrender.com/api/liabilities";
+const BASE = import.meta.env.VITE_API_URL;
+const API_BASE=`${BASE}/api/liabilities`;
+
 
 const formatCurrency = (val) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val || 0);
@@ -655,7 +657,7 @@ function LiabilityRow({ liability, onEdit, onDelete, onPay, onBalanceUpdated }) 
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function LiabilityManager() {
+export default function LiabilityManager({ token }) {
   const [liabilities, setLiabilities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);

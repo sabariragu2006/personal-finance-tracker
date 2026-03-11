@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API_BASE = "https://personal-finance-tracker-y5n7.onrender.com/api/transactions";
+const BASE = import.meta.env.VITE_API_URL;
+const API_BASE=`${BASE}/api/transactions`;
+
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -464,7 +466,7 @@ const pgStyles = {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function Transactions() {
+export default function Transactions({ token }) {
   const [transactions, setTransactions] = useState([]);
   const [pagination,   setPagination]   = useState(null);
   const [summary,      setSummary]      = useState(null);

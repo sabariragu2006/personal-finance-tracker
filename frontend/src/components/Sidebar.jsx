@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 
-const ASSETS_API      = "https://personal-finance-tracker-y5n7.onrender.com/api/assets";
-const LIABILITIES_API = "https://personal-finance-tracker-y5n7.onrender.com/api/liabilities";
-const TRANSACTIONS_API = "https://personal-finance-tracker-y5n7.onrender.com/api/transactions";
+const BASE = import.meta.env.VITE_API_URL;
+const ASSETS_API       = `${BASE}/api/assets`;
+const LIABILITIES_API  = `${BASE}/api/liabilities`;
+const TRANSACTIONS_API = `${BASE}/api/transactions`;
 
 const NAV_ITEMS = [
   {

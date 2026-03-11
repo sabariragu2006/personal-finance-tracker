@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 
-const API_BASE = "https://personal-finance-tracker-y5n7.onrender.com/api/assets";
+const BASE = import.meta.env.VITE_API_URL;
+const API_BASE = `${BASE}/api/assets`;
+
 const formatCurrency = (val) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val || 0);
 
@@ -618,7 +620,7 @@ function AssetRow({ asset, onEdit, onDelete, onBuy, onSell, onCurrentValueUpdate
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function AssetManager() {
+export default function AssetManager({ token }) {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);

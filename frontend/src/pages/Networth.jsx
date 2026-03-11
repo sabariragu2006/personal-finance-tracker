@@ -11,8 +11,9 @@ import {
   Legend,
 } from "recharts";
 
-const ASSETS_API      = "https://personal-finance-tracker-y5n7.onrender.com/api/assets";
-const LIABILITIES_API = "https://personal-finance-tracker-y5n7.onrender.com/api/liabilities";
+const BASE = import.meta.env.VITE_API_URL;
+const ASSETS_API       = `${BASE}/api/assets`;
+const LIABILITIES_API  = `${BASE}/api/liabilities`;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -340,7 +341,7 @@ const slStyles = {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function NetWorth() {
+export default function NetWorth({ token }) {
   const [assets, setAssets]           = useState([]);
   const [liabilities, setLiabilities] = useState([]);
   const [loading, setLoading]         = useState(true);
