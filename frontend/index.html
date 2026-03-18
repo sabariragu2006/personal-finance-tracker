@@ -4,39 +4,90 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- ── Favicon ── -->
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
 
-    <!-- ── Primary SEO ── -->
+    <!-- Primary SEO -->
     <title>Maadala — Personal Finance & Portfolio Tracker</title>
     <meta name="description" content="Vaultfolio helps you track your assets, liabilities, net worth, and investments in one place. Get real-time insights into your personal portfolio." />
-    <meta name="keywords" content="personal finance tracker, portfolio tracker, net worth, assets, liabilities, investment tracker, financial dashboard" />
+    <meta name="keywords" content="personal finance tracker, portfolio tracker, net worth tracker, assets and liabilities, investment dashboard, financial overview" />
     <meta name="author" content="Vaultfolio" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://dulcet-phoenix-32f7f5.netlify.app/" />
 
-    <!-- ── Google Search Console Verification ── -->
+    <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="ocAbf1ucvHiDjpFr56I_SlYl_-pVQ3-ZDEbzIhfYaWQ" />
 
-    <!-- ── Open Graph (for social sharing) ── -->
+    <!-- Open Graph -->
     <meta property="og:type"        content="website" />
     <meta property="og:url"         content="https://dulcet-phoenix-32f7f5.netlify.app/" />
     <meta property="og:title"       content="Vaultfolio — Personal Finance & Portfolio Tracker" />
     <meta property="og:description" content="Track your assets, liabilities, net worth, and investments in one elegant dashboard." />
     <meta property="og:image"       content="https://dulcet-phoenix-32f7f5.netlify.app/og-image.png" />
 
-    <!-- ── Twitter Card ── -->
+    <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary_large_image" />
-    <meta name="twitter:url"         content="https://dulcet-phoenix-32f7f5.netlify.app/" />
     <meta name="twitter:title"       content="Vaultfolio — Personal Finance & Portfolio Tracker" />
     <meta name="twitter:description" content="Track your assets, liabilities, net worth, and investments in one elegant dashboard." />
     <meta name="twitter:image"       content="https://dulcet-phoenix-32f7f5.netlify.app/og-image.png" />
 
-    <!-- ── Theme color (browser chrome) ── -->
     <meta name="theme-color" content="#07080d" />
+
+    <style>
+      /* Static SEO shell — hidden once React mounts */
+      #seo-shell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: #07080d;
+        color: #e2e8f0;
+        font-family: Georgia, serif;
+        text-align: center;
+        padding: 40px 24px;
+      }
+      #seo-shell h1 { font-size: 2.4rem; margin-bottom: 16px; color: #f1f5f9; }
+      #seo-shell h2 { font-size: 1.1rem; color: #94a3b8; font-weight: 400; margin-bottom: 32px; max-width: 560px; line-height: 1.7; }
+      #seo-shell ul { list-style: none; padding: 0; margin: 0 0 32px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+      #seo-shell ul li { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); border-radius: 999px; padding: 8px 20px; color: #818cf8; font-size: 0.9rem; }
+      #seo-shell p { font-size: 0.85rem; color: #475569; max-width: 480px; line-height: 1.7; }
+      /* Hide shell as soon as React root has children */
+      #root:not(:empty) ~ #seo-shell,
+      #root:not(:empty) + #seo-shell { display: none; }
+    </style>
   </head>
   <body>
+    <!-- React mounts here -->
     <div id="root"></div>
+
+    <!--
+      Static SEO shell — visible to Googlebot and users before JS loads.
+      React renders into #root above; once it hydrates this section is hidden via CSS.
+      DO NOT REMOVE — this is what Google indexes.
+    -->
+    <div id="seo-shell" aria-hidden="true">
+      <h1>Vaultfolio — Personal Finance &amp; Portfolio Tracker</h1>
+      <h2>
+        Track all your assets, liabilities, net worth, and investments
+        in one place. Get clear, real-time insights into your personal
+        financial portfolio.
+      </h2>
+      <ul>
+        <li>Asset Tracking</li>
+        <li>Liability Management</li>
+        <li>Net Worth Dashboard</li>
+        <li>Investment Reports</li>
+        <li>Transaction History</li>
+        <li>Portfolio Analytics</li>
+      </ul>
+      <p>
+        Vaultfolio is a personal finance dashboard that helps you monitor
+        your investments, track debt, visualise net worth over time, and
+        make informed financial decisions — all in a single secure app.
+      </p>
+    </div>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
