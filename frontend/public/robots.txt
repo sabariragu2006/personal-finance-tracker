@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Block API routes from being crawled
+Disallow: /api/
+
+Sitemap: https://dulcet-phoenix-32f7f5.netlify.app/sitemap.xml

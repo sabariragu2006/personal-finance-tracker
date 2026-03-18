@@ -119,7 +119,7 @@ function MobileHeader() {
         <span style={{
           fontFamily: "'DM Serif Display', serif",
           fontSize: 18, color: "#f0f4ff", letterSpacing: "-0.3px",
-        }}>Vaultfolio</span>
+        }}>Maadala</span>
       </div>
       {/* Mini stats strip */}
       <div style={{ display: "flex", gap: 12 }}>
@@ -174,7 +174,7 @@ function LeftPanel({ isTablet }) {
         <span style={{
           fontFamily: "'DM Serif Display', serif",
           fontSize: 20, color: "#f0f4ff", letterSpacing: "-0.3px",
-        }}>Vaultfolio</span>
+        }}>Maadala</span>
       </div>
 
       <div style={{ position: "relative", flex: 1 }}>
@@ -284,7 +284,7 @@ function LoginForm({ onSuccess, onSwitch, isMobile }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 12, color: "#041009",
           }}>◈</div>
-          <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 17, color: "#f0f4ff" }}>Vaultfolio</span>
+          <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 17, color: "#f0f4ff" }}>Maadala</span>
         </div>
       )}
 
@@ -411,7 +411,7 @@ function RegisterForm({ onSuccess, onSwitch, isMobile }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 12, color: "#041009",
           }}>◈</div>
-          <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 17, color: "#f0f4ff" }}>Vaultfolio</span>
+          <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 17, color: "#f0f4ff" }}>Maadala</span>
         </div>
       )}
 

@@ -12,16 +12,35 @@ import AuthPage     from "./pages/AuthPage";
 
 const BASE = import.meta.env.VITE_API_URL;
 
+function useLayout() {
+  const get = () => {
+    if (typeof window === "undefined") return { ml: 260, pt: 0, pb: 0 };
+    const w = window.innerWidth;
+    if (w < 420)  return { ml: 0,   pt: 54, pb: 60 }; // mobile xs: top bar + bottom nav
+    if (w < 640)  return { ml: 0,   pt: 54, pb: 0  }; // mobile: top bar only
+    if (w < 1024) return { ml: 64,  pt: 0,  pb: 0  }; // tablet: icon rail
+    return              { ml: 260, pt: 0,  pb: 0  }; // desktop
+  };
+  const [layout, setLayout] = useState(get);
+  useEffect(() => {
+    const h = () => setLayout(get());
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
+  return layout;
+}
+
 function App() {
   const [view,   setView]   = useState("home");
   const [active, setActive] = useState("dashboard");
   const [user,   setUser]   = useState(null);
   const [token,  setToken]  = useState(() => localStorage.getItem("vaultfolio_token") || "");
 
+  const { ml, pt, pb } = useLayout();
+
   useEffect(() => {
     const storedToken = localStorage.getItem("vaultfolio_token");
     if (!storedToken) return;
-
     fetch(`${BASE}/api/auth/me`, {
       headers: { Authorization: `Bearer ${storedToken}` },
     })
@@ -58,14 +77,10 @@ function App() {
     setView("home");
   };
 
-  const handleUserUpdate = (updatedUser) => {
-    setUser(updatedUser);
-  };
-
   if (view === "home") {
     return (
       <HomePage
-        onLogin={()   => setView("login")}
+        onLogin={()    => setView("login")}
         onRegister={() => setView("register")}
       />
     );
@@ -93,12 +108,14 @@ function App() {
       />
 
       <div style={{
-        marginLeft: 260,
+        marginLeft: ml,
+        paddingTop: pt,
+        paddingBottom: pb,
         flex: 1,
         minWidth: 0,
-        height: "100%",
         minHeight: "100vh",
         overflowY: "auto",
+        transition: "margin-left 0.28s cubic-bezier(0.4,0,0.2,1)",
       }}>
         {active === "dashboard"    && <Dashboard    token={token} />}
         {active === "assets"       && <AssetManager token={token} />}
@@ -110,7 +127,7 @@ function App() {
           <Profile
             user={user}
             token={token}
-            onUserUpdate={handleUserUpdate}
+            onUserUpdate={(u) => setUser(u)}
             onLogout={handleLogout}
           />
         )}
